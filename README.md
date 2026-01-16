@@ -2,6 +2,32 @@
 
 This repository contains the take-home assessment for the Flutter Developer position at PulseNow.
 
+## 📸 Screenshots & Demo
+
+### Test Coverage Report
+
+The project achieves **70.1% code coverage** with comprehensive unit and integration tests across all layers:
+
+![Test Coverage Report](coverage-screenshot.png)
+
+**Coverage Breakdown:**
+- **Core Components**: 100% coverage (enums, errors)
+- **Models**: 100% coverage
+- **Cache Service**: 92.3% coverage
+- **Services**: 68.3% coverage
+- **Providers**: 60.7% coverage
+
+> 📊 View the full interactive coverage report: [Open Coverage Report](flutter_app/coverage/html/index.html)
+
+### Demo Video
+
+📹 [Watch the demo video](./demo.mov) to see the app in action with:
+- Real-time WebSocket updates
+- Search and sort functionality
+- Dark mode support
+- Pull-to-refresh
+- Error handling and loading states
+
 ## Project Structure
 
 ```
