@@ -8,7 +8,7 @@ This repository contains the take-home assessment for the Flutter Developer posi
 
 The project achieves **70.1% code coverage** with comprehensive unit and integration tests across all layers:
 
-![Test Coverage Report](https://drive.google.com/file/d/1BdlqnO86Q5wGnDL64AcDU7eiSc77HLqO/view?usp=sharing)
+![Test Coverage Report](https://drive.google.com/uc?export=view&id=1BdlqnO86Q5wGnDL64AcDU7eiSc77HLqO)
 
 **Coverage Breakdown:**
 - **Core Components**: 100% coverage (enums, errors)
