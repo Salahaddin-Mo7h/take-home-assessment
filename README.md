@@ -8,7 +8,7 @@ This repository contains the take-home assessment for the Flutter Developer posi
 
 The project achieves **70.1% code coverage** with comprehensive unit and integration tests across all layers:
 
-![Test Coverage Report](coverage-screenshot.png)
+![Test Coverage Report](https://drive.google.com/file/d/1BdlqnO86Q5wGnDL64AcDU7eiSc77HLqO/view?usp=sharing)
 
 **Coverage Breakdown:**
 - **Core Components**: 100% coverage (enums, errors)
@@ -21,7 +21,7 @@ The project achieves **70.1% code coverage** with comprehensive unit and integra
 
 ### Demo Video
 
-📹 [Watch the demo video](./demo.mov) to see the app in action with:
+📹 [Watch the demo video](https://drive.google.com/file/d/18arOgmnQ0BSecWdFolqbOeVhYW8wuL-g/view?usp=sharing) to see the app in action with:
 - Real-time WebSocket updates
 - Search and sort functionality
 - Dark mode support
