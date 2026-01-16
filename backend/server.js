@@ -36,38 +36,75 @@ const server = http.createServer(app);
 
 // WebSocket server for real-time updates
 const wss = new WebSocket.Server({ server });
+const { mockMarketData } = require('./data/mockMarketData');
+
+// Base prices for each symbol (for realistic price variations)
+const basePrices = {
+  'BTC/USD': 43250.50,
+  'ETH/USD': 2650.75,
+  'SOL/USD': 98.25,
+  'ADA/USD': 0.52,
+  'DOT/USD': 7.85
+};
+
+const baseChanges = {
+  'BTC/USD': 2.5,
+  'ETH/USD': -1.2,
+  'SOL/USD': 5.3,
+  'ADA/USD': 1.8,
+  'DOT/USD': -0.5
+};
 
 wss.on('connection', (ws) => {
   console.log('WebSocket client connected');
   
-  // Send initial market data
-  const initialData = {
-    type: 'market_update',
-    data: {
-      symbol: 'BTC/USD',
-      price: 43250.50,
-      change24h: 2.5,
-      volume: 1250000000,
-      timestamp: new Date().toISOString()
-    }
-  };
-  ws.send(JSON.stringify(initialData));
-
-  // Simulate real-time updates every 2 seconds
-  const interval = setInterval(() => {
-    const update = {
+  // Send initial market data for all symbols
+  const symbols = ['BTC/USD', 'ETH/USD', 'SOL/USD', 'ADA/USD', 'DOT/USD'];
+  symbols.forEach((symbol) => {
+    const basePrice = basePrices[symbol];
+    const baseChange = baseChanges[symbol];
+    const initialData = {
       type: 'market_update',
       data: {
-        symbol: 'BTC/USD',
-        price: (43250 + Math.random() * 1000 - 500).toFixed(2),
-        change24h: (2.5 + Math.random() * 2 - 1).toFixed(2),
-        volume: (1250000000 + Math.random() * 100000000).toFixed(0),
+        symbol: symbol,
+        price: parseFloat((basePrice * (1 + (Math.random() - 0.5) * 0.001)).toFixed(2)),
+        change24h: parseFloat((baseChange + (Math.random() - 0.5) * 0.2).toFixed(2)),
+        volume: Math.floor(1250000000 * (0.5 + Math.random())),
         timestamp: new Date().toISOString()
       }
     };
-    
+    ws.send(JSON.stringify(initialData));
+  });
+
+  // Simulate real-time updates every 2 seconds for all symbols
+  const interval = setInterval(() => {
     if (ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(update));
+      symbols.forEach((symbol) => {
+        const basePrice = basePrices[symbol];
+        const baseChange = baseChanges[symbol];
+        
+        // Generate realistic price variation (±1%)
+        const priceVariation = (Math.random() - 0.5) * 0.02;
+        const newPrice = basePrice * (1 + priceVariation);
+        
+        // Generate realistic change variation
+        const changeVariation = (Math.random() - 0.5) * 0.2;
+        const newChange = baseChange + changeVariation;
+        
+        const update = {
+          type: 'market_update',
+          data: {
+            symbol: symbol,
+            price: parseFloat(newPrice.toFixed(2)),
+            change24h: parseFloat(newChange.toFixed(2)),
+            changePercent24h: parseFloat(newChange.toFixed(2)),
+            volume: Math.floor(1250000000 * (0.5 + Math.random())),
+            timestamp: new Date().toISOString()
+          }
+        };
+        
+        ws.send(JSON.stringify(update));
+      });
     }
   }, 2000);
 
