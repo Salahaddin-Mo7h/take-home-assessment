@@ -1,34 +1,80 @@
 import 'package:flutter/foundation.dart';
 import '../services/api_service.dart';
+import '../models/portfolio_model.dart';
 
 class PortfolioProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
-  
-  Map<String, dynamic>? _summary;
-  List<dynamic> _holdings = [];
+
+  PortfolioSummary? _summary;
+  List<PortfolioHolding> _holdings = [];
+  PortfolioPerformance? _performance;
   bool _isLoading = false;
   String? _error;
-  
-  Map<String, dynamic>? get summary => _summary;
-  List<dynamic> get holdings => _holdings;
+
+  PortfolioSummary? get summary => _summary;
+  List<PortfolioHolding> get holdings => _holdings;
+  PortfolioPerformance? get performance => _performance;
   bool get isLoading => _isLoading;
   String? get error => _error;
-  
-  // TODO: Implement methods
-  // - loadPortfolioSummary()
-  // - loadHoldings()
-  // - loadPerformance(String timeframe)
-  // - addTransaction(Map<String, dynamic> transaction)
-  
+
   Future<void> loadPortfolioSummary() async {
     _isLoading = true;
     _error = null;
     notifyListeners();
-    
+
     try {
-      // TODO: Implement API call
-      // final response = await _apiService.getPortfolioSummary();
-      // _summary = response['data'];
+      final response = await _apiService.getPortfolioSummary();
+      _summary = PortfolioSummary.fromJson(response);
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadHoldings() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiService.getPortfolioHoldings();
+      _holdings =
+          response.map((json) => PortfolioHolding.fromJson(json)).toList();
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadPerformance(String timeframe) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiService.getPortfolioPerformance(timeframe);
+      _performance = PortfolioPerformance.fromJson(response);
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> addTransaction(Map<String, dynamic> transaction) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _apiService.addTransaction(transaction);
+      await loadHoldings();
+      await loadPortfolioSummary();
     } catch (e) {
       _error = e.toString();
     } finally {

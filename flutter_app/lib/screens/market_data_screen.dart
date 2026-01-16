@@ -1,58 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/market_data_provider.dart';
+import '../widgets/market_data_card.dart';
+import '../widgets/search_and_sort_bar.dart';
+import '../widgets/error_state_widget.dart';
+import '../widgets/empty_state_widget.dart';
+import '../utils/formatters.dart';
+import '../utils/navigation_helpers.dart';
+import 'market_data_detail_screen.dart';
 
-class MarketDataScreen extends StatefulWidget {
+class MarketDataScreen extends StatelessWidget {
   const MarketDataScreen({super.key});
-
-  @override
-  State<MarketDataScreen> createState() => _MarketDataScreenState();
-}
-
-class _MarketDataScreenState extends State<MarketDataScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // TODO: Load market data when screen initializes
-    // Provider.of<MarketDataProvider>(context, listen: false).loadMarketData();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<MarketDataProvider>(
       builder: (context, provider, child) {
-        // TODO: Implement the UI
-        // Show loading indicator when provider.isLoading is true
-        // Show error message when provider.error is not null
-        // Show list of market data when provider.marketData is available
-        // Each list item should show:
-        //   - Symbol (e.g., "BTC/USD")
-        //   - Price (formatted as currency)
-        //   - 24h change (with color: green for positive, red for negative)
-        // Implement pull-to-refresh using RefreshIndicator
-        
-        if (provider.isLoading) {
+        if (provider.isLoadingFromCache && provider.marketData.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-        
-        if (provider.error != null) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Error: ${provider.error}'),
-                ElevatedButton(
-                  onPressed: () => provider.loadMarketData(),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
+
+        if (provider.isLoading && provider.marketData.isEmpty) {
+          return const Center(
+            child: CircularProgressIndicator(),
           );
         }
-        
-        // TODO: Replace this placeholder with actual list implementation
-        return const Center(
-          child: Text('Market Data Screen - To be implemented'),
+
+        if (provider.error != null && provider.marketData.isEmpty) {
+          return ErrorStateWidget(
+            error: provider.error!,
+            onRetry: () => provider.retry(),
+          );
+        }
+
+        if (provider.marketData.isEmpty && !provider.isLoading) {
+          return EmptyStateWidget(
+            onRefresh: () => provider.loadMarketData(),
+          );
+        }
+
+        return AnimatedOpacity(
+          opacity: 1.0,
+          duration: const Duration(milliseconds: 300),
+          child: Column(
+            children: [
+              SearchAndSortBar(provider: provider),
+              
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () => NavigationHelpers.refreshMarketData(context),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: provider.marketData.length,
+                    itemBuilder: (context, index) {
+                      final marketData = provider.marketData[index];
+                      return MarketDataCard(
+                        marketData: marketData,
+                        formatCurrency: Formatters.formatCurrency,
+                        formatPercent: Formatters.formatPercent,
+                        getChangeColor: Formatters.getChangeColor,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MarketDataDetailScreen(
+                                marketData: marketData,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

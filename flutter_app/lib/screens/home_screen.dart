@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'market_data_screen.dart';
+import '../widgets/app_bar_widget.dart';
+import '../core/strings/app_strings.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('PulseNow'),
-        elevation: 0,
-      ),
-      body: const MarketDataScreen(),
+    return const Scaffold(
+      appBar: AppBarWidget(title: AppStrings.appName),
+      body: MarketDataScreen(),
     );
   }
 }
